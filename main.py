@@ -15,12 +15,7 @@ import sys
 # ------------------------
 # Inicialización NLP
 # ------------------------
-# Verificar si el modelo de spaCy está instalado
-try:
-    nlp = spacy.load("es_core_news_sm")
-except OSError:
-    subprocess.check_call([sys.executable, "-m", "spacy", "download", "es_core_news_sm"])
-    nlp = spacy.load("es_core_news_sm")
+
 
 def preprocess(text):
     """Preprocesa texto en español: minúsculas, lematización, stopwords"""
@@ -218,4 +213,5 @@ with st.form(key="form_agregar_nl_sql"):
             st.success(f"✅ Frase agregada correctamente: '{nueva_nl}'")
         else:
             st.error("❗ Complete ambos campos antes de agregar.")
+
 
