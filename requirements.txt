@@ -1,4 +1,8 @@
 streamlit
 pandas
-matplotlib
-seaborn
+torch
+transformers
+sentence-transformers
+scikit-learn
+spacy
+nltk
