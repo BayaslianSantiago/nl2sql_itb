@@ -9,14 +9,21 @@ from sklearn.metrics.pairwise import cosine_similarity
 import spacy
 import json
 import os
+import subprocess
+import sys
 
 # ------------------------
 # Inicialización NLP
 # ------------------------
-nlp = spacy.load("es_core_news_sm")  # modelo español spaCy
+# Verificar si el modelo de spaCy está instalado
+try:
+    nlp = spacy.load("es_core_news_sm")
+except OSError:
+    subprocess.check_call([sys.executable, "-m", "spacy", "download", "es_core_news_sm"])
+    nlp = spacy.load("es_core_news_sm")
 
 def preprocess(text):
-    """Preprocesa texto en español: minusculas, lematización, stopwords"""
+    """Preprocesa texto en español: minúsculas, lematización, stopwords"""
     doc = nlp(text.lower())
     tokens = [token.lemma_ for token in doc if token.is_alpha and not token.is_stop]
     return " ".join(tokens)
@@ -123,7 +130,6 @@ init_db()
 # ------------------------
 DICT_FILE = "nl2sql_dict.json"
 
-# Cargar o crear diccionario
 if os.path.exists(DICT_FILE):
     with open(DICT_FILE, "r", encoding="utf-8") as f:
         nl2sql_examples = json.load(f)
@@ -177,9 +183,9 @@ st.title("💡 Consulta NL → SQL Dinámico")
 
 # --- Sección de consulta ---
 st.subheader("🔍 Consulta en lenguaje natural")
-consulta_nl = st.text_input("Ingrese su consulta:", key="input_consulta_nl")
+consulta_nl = st.text_input("Ingrese su consulta:")
 
-if st.button("Ejecutar consulta", key="btn_ejecutar_consulta") and consulta_nl:
+if st.button("Ejecutar consulta") and consulta_nl:
     sql, score = query_to_sql(consulta_nl)
     st.markdown(f"**SQL generado:** `{sql}`")
     st.markdown(f"**Confianza:** {round(score,3)}")
@@ -196,19 +202,20 @@ if st.button("Ejecutar consulta", key="btn_ejecutar_consulta") and consulta_nl:
 
 # --- Sección para agregar nuevas frases ---
 st.subheader("➕ Agregar nueva frase NL → SQL")
+
 with st.form(key="form_agregar_nl_sql"):
-    nueva_nl = st.text_input("Nueva frase en lenguaje natural", key="input_nueva_nl")
-    nuevo_sql = st.text_area("Consulta SQL correspondiente", key="textarea_nuevo_sql")
-    submitted = st.form_submit_button("Agregar al diccionario", key="btn_agregar_dicc")
+    nueva_nl = st.text_input("Nueva frase en lenguaje natural")
+    nuevo_sql = st.text_area("Consulta SQL correspondiente")
+    
+    submitted = st.form_submit_button("Agregar al diccionario")
     
     if submitted:
-        if nueva_nl and nuevo_sql:
-            # Guardar en dict y archivo
+        if nueva_nl.strip() and nuevo_sql.strip():
             nl2sql_examples[nueva_nl] = nuevo_sql
             with open(DICT_FILE, "w", encoding="utf-8") as f:
                 json.dump(nl2sql_examples, f, ensure_ascii=False, indent=4)
-            # Actualizar embeddings
             example_embeddings[nueva_nl] = embed(preprocess(nueva_nl))
-            st.success(f"✅ Frase agregada: '{nueva_nl}'")
+            st.success(f"✅ Frase agregada correctamente: '{nueva_nl}'")
         else:
-            st.error("Complete ambos campos antes de agregar.")
+            st.error("❗ Complete ambos campos antes de agregar.")
+
