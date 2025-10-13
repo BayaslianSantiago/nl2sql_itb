@@ -16,10 +16,12 @@ Para instalar las dependencias del proyecto, se recomienda usar un entorno virtu
 
 * Crear un entorno virtual
 
+        bash    
         python -m venv venv
         
 * Activar el entorno virtual
-  
+
+        bash
         En Windows:
         venv\Scripts\activate
 
@@ -27,7 +29,8 @@ Para instalar las dependencias del proyecto, se recomienda usar un entorno virtu
         source venv/bin/activate
   
 * Instalar las dependencias
-  
+
+        bash
         pip install -r requirements.txt
 
 # Requisitos adicionales
@@ -47,6 +50,7 @@ Se utiliza el modelo de procesamiento de lenguaje natural de spaCy para preproce
 * Eliminación de stopwords (palabras vacías).
 Si el modelo *es_core_news_sm* no está instalado, el sistema lo descarga automáticamente.
 
+        python
         try:
             nlp = spacy.load("es_core_news_sm")
         except OSError:
@@ -59,6 +63,7 @@ El modelo de **embeddings** se carga utilizando la librería **Hugging Face Tran
 El modelo *distiluse-base-multilingual-cased-v1* se utiliza para generar representaciones vectoriales de las consultas NL.
 Estas representaciones permiten comparar la similitud entre la consulta del usuario y las frases predefinidas en el diccionario.
 
+        python
         @st.cache_resource
         def load_model():
             tokenizer = AutoTokenizer.from_pretrained("sentence-transformers/distiluse-base-multilingual-cased-v1")
@@ -75,6 +80,7 @@ El proyecto utiliza **SQLite** para gestionar la base de datos local *empresa.db
 * Facturas
 Si no existe, se crea una base de datos con datos predefinidos.
 
+        python
         def init_db():
             conn = sqlite3.connect("empresa.db")
             cursor = conn.cursor()
@@ -84,6 +90,7 @@ Si no existe, se crea una base de datos con datos predefinidos.
 
 El sistema tiene un diccionario predefinido de *frases NL y sus respectivas consultas SQL*. Este diccionario puede ser modificado por el usuario para agregar nuevas entradas mediante la *interfaz de Streamlit*.
 
+        python
         if os.path.exists(DICT_FILE):
             with open(DICT_FILE, "r", encoding="utf-8") as f:
                 nl2sql_examples = json.load(f)
@@ -104,6 +111,7 @@ Luego, se compara con las frases predefinidas en el diccionario mediante la *sim
 ## 6. Ejecución de Consultas SQL
 Una vez que se genera la *consulta SQL*, esta se ejecuta en la base de datos SQLite y se *muestran los resultados* en la interfaz de Streamlit.
 
+        python
         def ejecutar_sql(sql):
             with sqlite3.connect("empresa.db") as conn:
                 cur = conn.cursor()
