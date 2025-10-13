@@ -1,4 +1,4 @@
-# Consulta NL → SQL Dinámico
+# **Consulta NL → SQL Dinámico**
 ---
 Este proyecto implementa una interfaz en Streamlit para realizar consultas en lenguaje natural (NL) sobre una base de datos SQL.
 Utiliza un modelo de embeddings para convertir consultas NL en sentencias SQL correspondientes, permitiendo realizar consultas de forma más intuitiva. Además, el sistema permite agregar nuevas frases en NL y sus respectivas consultas SQL al diccionario del sistema, lo que facilita su expansión.
@@ -14,14 +14,23 @@ Utiliza un modelo de embeddings para convertir consultas NL en sentencias SQL co
 # Instalación de dependencias
 Para instalar las dependencias del proyecto, se recomienda usar un entorno virtual:
 
-    # Crear un entorno virtual
-    python -m venv venv
-    
-    # Activar el entorno virtual
-    # En Windows:
-    venv\Scripts\activate
-    # En macOS/Linux:
-    source venv/bin/activate
-    
-    # Instalar las dependencias
-    pip install -r requirements.txt
+* Crear un entorno virtual
+
+        python -m venv venv
+        
+* Activar el entorno virtual
+  
+        En Windows:
+        venv\Scripts\activate
+
+        En macOS/Linux:
+        source venv/bin/activate
+  
+* Instalar las dependencias
+  
+        pip install -r requirements.txt
+
+# Requisitos adicionales
+
+* **Modelo spaCy**: El proyecto requiere el modelo de spaCy es_core_news_sm, que se descarga automáticamente si no está presente.
+* **Modelo preentrenado para embeddings:** Se utiliza el modelo sentence-transformers/distiluse-base-multilingual-cased-v1 para generar los embeddings de las consultas NL.
