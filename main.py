@@ -1,4 +1,3 @@
-# app_nl2sql_dynamic_fixed.py
 import streamlit as st
 import sqlite3
 import pandas as pd
@@ -218,3 +217,4 @@ with st.form(key="form_agregar_nl_sql"):
             st.success(f"✅ Frase agregada correctamente: '{nueva_nl}'")
         else:
             st.error("❗ Complete ambos campos antes de agregar.")
+
