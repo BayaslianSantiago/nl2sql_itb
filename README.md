@@ -10,3 +10,18 @@ Utiliza un modelo de embeddings para convertir consultas NL en sentencias SQL co
 * SpaCy
 * SQLite
 * Scikit-learn
+
+# Instalación de dependencias
+Para instalar las dependencias del proyecto, se recomienda usar un entorno virtual:
+
+    # Crear un entorno virtual
+    python -m venv venv
+    
+    # Activar el entorno virtual
+    # En Windows:
+    venv\Scripts\activate
+    # En macOS/Linux:
+    source venv/bin/activate
+    
+    # Instalar las dependencias
+    pip install -r requirements.txt
