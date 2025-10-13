@@ -102,6 +102,7 @@ El sistema tiene un diccionario predefinido de *frases NL y sus respectivas cons
 Cuando un usuario ingresa una *consulta en lenguaje natural*, esta se *preprocesa* y se convierte en un *vector de embeddings*.
 Luego, se compara con las frases predefinidas en el diccionario mediante la *similitud del coseno*. La consulta que tenga la mayor similitud se *ejecuta como una consulta SQL* en la base de datos.
 
+        python
         def query_to_sql(user_query):
             user_emb = embed(preprocess(user_query))
             sims = {k: cosine_similarity(user_emb, v)[0][0] for k, v in example_embeddings.items()}
@@ -120,7 +121,7 @@ Una vez que se genera la *consulta SQL*, esta se ejecuta en la base de datos SQL
                 columnas = [desc[0] for desc in cur.description]
             return columnas, resultados
 
-7. Interfaz de Usuario en Streamlit
+## 7. Interfaz de Usuario en Streamlit
    
    1. La interfaz de usuario se desarrolla utilizando Streamlit. La aplicación permite:
    2. Ingresar una consulta en lenguaje natural.
