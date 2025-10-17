@@ -1,148 +1,176 @@
-# Consulta NL → SQL Dinámico
+# 💡 Consulta NL → SQL Dinámico
+
+Aplicación web interactiva que permite realizar consultas a bases de datos SQL utilizando lenguaje natural en español. Powered by Streamlit y Transformers.
+
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://tu-app.streamlit.app)
+
+## 🌟 Características
+
+- 🗣️ **Consultas en lenguaje natural**: Pregunta en español y obtén resultados SQL automáticamente
+- 🧠 **Machine Learning**: Usa embeddings multilingües para entender la intención del usuario
+- 📊 **Base de datos de ejemplo**: Incluye datos de productos, clientes, ventas y facturas
+- ➕ **Diccionario expandible**: Agrega tus propios patrones de consulta dinámicamente
+- 🎯 **Score de confianza**: Muestra qué tan seguro está el modelo de la interpretación
+- 🖥️ **Interfaz intuitiva**: Diseño limpio con tabs y sidebar informativo
+
+## 🚀 Demo en vivo
+
+Prueba la aplicación aquí: [nl2sql]([https://tu-app.streamlit.app](https://nl2sql-ia.streamlit.app/))
+
+## 📋 Requisitos
+
+- Python 3.8+
+- Streamlit
+- PyTorch
+- Transformers (HuggingFace)
+- Scikit-learn
+- Pandas
+
+## 🛠️ Instalación local
+
+1. **Clona el repositorio**
+```bash
+git clone https://github.com/tu-usuario/nl-to-sql.git
+cd nl-to-sql
+```
+
+2. **Crea un entorno virtual**
+```bash
+python -m venv venv
+source venv/bin/activate  # En Windows: venv\Scripts\activate
+```
+
+3. **Instala las dependencias**
+```bash
+pip install -r requirements.txt
+```
+
+4. **Ejecuta la aplicación**
+```bash
+streamlit run app.py
+```
+
+La aplicación se abrirá automáticamente en tu navegador en `http://localhost:8501`
+
+## 📖 Uso
+
+### 1. Realizar consultas
+
+Escribe tu pregunta en lenguaje natural en la pestaña **"Consultar"**:
+
+```
+Ejemplos:
+- "listar todos los clientes"
+- "ventas totales"
+- "productos por rubro"
+- "mostrar facturas"
+```
+
+El sistema:
+- Encuentra la consulta SQL más similar
+- Muestra el score de confianza
+- Ejecuta la consulta y muestra los resultados
+
+### 2. Agregar nuevos patrones
+
+En la pestaña **"Agregar Frase"** puedes expandir el diccionario:
+
+**Frase natural:** `productos más vendidos`  
+**SQL:** `SELECT p.nombre, COUNT(*) as ventas FROM productos p JOIN ventas v GROUP BY p.id ORDER BY ventas DESC LIMIT 10;`
+
+### 3. Ver ejemplos disponibles
+
+La pestaña **"Ver Ejemplos"** muestra todos los patrones del diccionario actual.
+
+## 🗄️ Estructura de la Base de Datos
+
+La aplicación incluye una base de datos SQLite de ejemplo con las siguientes tablas:
+
+- **rubros**: Categorías de productos
+- **productos**: Inventario de productos con precios
+- **clientes**: Información de clientes
+- **sucursales**: Ubicaciones de venta
+- **ventas**: Registros de transacciones
+- **facturas**: Documentos de facturación
+
+### Diagrama ER
+
+```
+rubros ──┐
+         │
+         ├─── productos
+         
+clientes ──┐
+           │
+sucursales ├─── ventas ─── facturas
+           │
+```
+
+##  Tecnología
+
+### Modelo de Embeddings
+
+Utiliza `paraphrase-multilingual-MiniLM-L12-v2` de Sentence Transformers:
+- Multilingüe (español incluido)
+- Ligero (~120MB)
+- Rápido para inference
+- Genera embeddings de 384 dimensiones
+
+### Procesamiento de Lenguaje Natural
+
+- **Preprocesamiento**: Normalización de texto, eliminación de stopwords
+- **Similitud coseno**: Encuentra la consulta más similar en el diccionario
+- **Threshold de confianza**: Alerta cuando el score es < 0.6
+
+## 📁 Estructura del proyecto
+
+```
+nl-to-sql/
+│
+├── app.py                 # Aplicación principal
+├── requirements.txt       # Dependencias
+├── README.md             # Este archivo
+└── .gitignore            # Archivos ignorados
+```
+
+## 🔧 Configuración avanzada
+
+### Cambiar el modelo de embeddings
+
+En `app.py`, línea 35-38, puedes cambiar el modelo:
+
+```python
+tokenizer = AutoTokenizer.from_pretrained(
+    "sentence-transformers/otro-modelo-multilingue"
+)
+```
+
+### Modificar el threshold de confianza
+
+En `app.py`, línea 210, ajusta el valor:
+
+```python
+if score < 0.6:  # Cambiar este valor
+```
+
+### Agregar más tablas a la BD
+
+Modifica la función `init_db()` en `app.py` para incluir nuevas tablas y datos.
+
+La primera carga tardará ~5-10 minutos mientras descarga el modelo.
+
+## Limitaciones
+
+- La base de datos se reinicia con cada deploy en Streamlit Cloud
+- El diccionario NL→SQL no persiste entre sesiones (se reinicia al recargar)
+- Solo soporta consultas SELECT (por seguridad)
+- El modelo puede no entender consultas muy complejas o ambiguas
+
+
+##  Agradecimientos
+
+- [Streamlit](https://streamlit.io/) - Framework de la aplicación
+- [HuggingFace](https://huggingface.co/) - Modelos de Transformers
+- [Sentence Transformers](https://www.sbert.net/) - Embeddings semánticos
+- [Instituto Tecnológico Beltrán](https://www.ibeltran.com.ar/) - Por los recursos y a sus docentes por las enseñanzas
 ---
-Este proyecto implementa una interfaz en Streamlit para realizar consultas en lenguaje natural (NL) sobre una base de datos SQL.
-Utiliza un modelo de embeddings para convertir consultas NL en sentencias SQL correspondientes, permitiendo realizar consultas de forma más intuitiva. Además, el sistema permite agregar nuevas frases en NL y sus respectivas consultas SQL al diccionario del sistema, lo que facilita su expansión.
-### Requisitos
-* Python 3.7+
-* Streamlit
-* PyTorch
-* Transformers
-* SpaCy
-* SQLite
-* Scikit-learn
-
-# Instalación de dependencias
-Para instalar las dependencias del proyecto, se recomienda usar un entorno virtual:
-
-* Crear un entorno virtual
-
-        bash    
-        python -m venv venv
-        
-* Activar el entorno virtual
-
-        bash
-        En Windows:
-        venv\Scripts\activate
-
-        En macOS/Linux:
-        source venv/bin/activate
-  
-* Instalar las dependencias
-
-        bash
-        pip install -r requirements.txt
-
-# Requisitos adicionales
-
-* **Modelo spaCy**: El proyecto requiere el modelo de spaCy es_core_news_sm, que se descarga automáticamente si no está presente.
-* **Modelo preentrenado para embeddings:** Se utiliza el modelo sentence-transformers/distiluse-base-multilingual-cased-v1 para generar los embeddings de las consultas NL.
-
-### Descripción del Código
-
-El archivo principal del proyecto es app_nl2sql_dynamic_fixed.py, que se puede ejecutar en Streamlit para interactuar con el sistema de consulta NL → SQL. 
-A continuación, se detallan las principales secciones del código.
-
-## 1. Inicialización de la NLP (SpaCy)
-Se utiliza el modelo de procesamiento de lenguaje natural de spaCy para preprocesar el texto en español. Esto incluye:
-* Conversión a minúsculas.
-* Lematización.
-* Eliminación de stopwords (palabras vacías).
-Si el modelo *es_core_news_sm* no está instalado, el sistema lo descarga automáticamente.
-
-        python
-        try:
-            nlp = spacy.load("es_core_news_sm")
-        except OSError:
-            subprocess.check_call([sys.executable, "-m", "spacy", "download", "es_core_news_sm"])
-            nlp = spacy.load("es_core_news_sm")
-
-## 2. Modelo de Embeddings para Consultas NL → SQL
-
-El modelo de **embeddings** se carga utilizando la librería **Hugging Face Transformers**.
-El modelo *distiluse-base-multilingual-cased-v1* se utiliza para generar representaciones vectoriales de las consultas NL.
-Estas representaciones permiten comparar la similitud entre la consulta del usuario y las frases predefinidas en el diccionario.
-
-        python
-        @st.cache_resource
-        def load_model():
-            tokenizer = AutoTokenizer.from_pretrained("sentence-transformers/distiluse-base-multilingual-cased-v1")
-            model = AutoModel.from_pretrained("sentence-transformers/distiluse-base-multilingual-cased-v1")
-            return tokenizer, model
-
-## 3. Conexión y Creación de Base de Datos SQLite
-El proyecto utiliza **SQLite** para gestionar la base de datos local *empresa.db*, que incluye tablas para:
-* Rubros de productos
-* Productos
-* Clientes
-* Sucursales
-* Ventas
-* Facturas
-Si no existe, se crea una base de datos con datos predefinidos.
-
-        python
-        def init_db():
-            conn = sqlite3.connect("empresa.db")
-            cursor = conn.cursor()
-            # Creación de tablas e inserción de datos iniciales...
-
-## 4. Diccionario NL → SQL
-
-El sistema tiene un diccionario predefinido de *frases NL y sus respectivas consultas SQL*. Este diccionario puede ser modificado por el usuario para agregar nuevas entradas mediante la *interfaz de Streamlit*.
-
-        python
-        if os.path.exists(DICT_FILE):
-            with open(DICT_FILE, "r", encoding="utf-8") as f:
-                nl2sql_examples = json.load(f)
-        else:
-            nl2sql_examples = { ... }
-
-## 5. Generación de SQL a partir de la Consulta del Usuario
-
-Cuando un usuario ingresa una *consulta en lenguaje natural*, esta se *preprocesa* y se convierte en un *vector de embeddings*.
-Luego, se compara con las frases predefinidas en el diccionario mediante la *similitud del coseno*. La consulta que tenga la mayor similitud se *ejecuta como una consulta SQL* en la base de datos.
-
-        python
-        def query_to_sql(user_query):
-            user_emb = embed(preprocess(user_query))
-            sims = {k: cosine_similarity(user_emb, v)[0][0] for k, v in example_embeddings.items()}
-            best_match = max(sims, key=sims.get)
-            return nl2sql_examples[best_match], sims[best_match]
-
-## 6. Ejecución de Consultas SQL
-Una vez que se genera la *consulta SQL*, esta se ejecuta en la base de datos SQLite y se *muestran los resultados* en la interfaz de Streamlit.
-
-        python
-        def ejecutar_sql(sql):
-            with sqlite3.connect("empresa.db") as conn:
-                cur = conn.cursor()
-                cur.execute(sql)
-                resultados = cur.fetchall()
-                columnas = [desc[0] for desc in cur.description]
-            return columnas, resultados
-
-## 7. Interfaz de Usuario en Streamlit
-   
-   1. La interfaz de usuario se desarrolla utilizando Streamlit. La aplicación permite:
-   2. Ingresar una consulta en lenguaje natural.
-   3. Mostrar la consulta SQL generada y el nivel de confianza.
-   4. Ejecutar la consulta y mostrar los resultados en formato tabla.
-   5. Agregar nuevas frases NL → SQL al diccionario para futuras consultas.
-  
-        python
-        st.title("💡 Consulta NL → SQL Dinámico")
-        consulta_nl = st.text_input("Ingrese su consulta:")
-        if st.button("Ejecutar consulta") and consulta_nl:
-            sql, score = query_to_sql(consulta_nl)
-            columnas, resultados = ejecutar_sql(sql)
-            st.dataframe(resultados)
-
-# Como Usar
-* Ejecuta el archivo principal con Streamlit:
-
-        bash
-        streamlit run app.py
-  
-* Ingresa tu consulta en lenguaje natural en el campo de texto y haz clic en Ejecutar consulta.
-* La aplicación generará la consulta SQL correspondiente y mostrará los resultados en formato de tabla.
-* También puedes agregar nuevas frases en lenguaje natural y sus respectivas consultas SQL al diccionario mediante la interfaz de Agregar nueva frase NL → SQL.
