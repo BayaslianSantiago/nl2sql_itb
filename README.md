@@ -15,7 +15,7 @@ Aplicación web interactiva que permite realizar consultas a bases de datos SQL 
 
 ## 🚀 Demo en vivo
 
-Prueba la aplicación aquí: [https://nl2sql-ia.streamlit.app/](https://tu-app.streamlit.app](https://nl2sql-ia.streamlit.app/)
+Prueba la aplicación aquí: [app web](https://nl2sql-ia.streamlit.app/)
 
 ## 📋 Requisitos
 
